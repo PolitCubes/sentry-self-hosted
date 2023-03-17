@@ -100,16 +100,16 @@ services:
     <<: *restart_policy
     image: freinet/postfix-relay
     environment:
-      - MAILNAME=${SENTRY_MAIL_HOST:-}
-      - LOGOUTPUT=/var/log/${SENTRY_MAIL_HOST:-}/maillog
+      - MAILNAME=politcubes.com
+      - LOGOUTPUT=/var/log/politcubes.com/maillog
       - TLS_SECURITY_LEVEL=encrypt
       - POSTFIX_ADD_MISSING_HEADERS=yes
       - USE_DKIM=yes
-      - DKIM_KEYFILE=/etc/opendkim/keys/${SENTRY_MAIL_HOST:-}.key
+      - DKIM_KEYFILE=/etc/opendkim/keys/politcubes.com.key
       - DKIM_SELECTOR=sentry
     volumes:
-      - "/home/postfix/${SENTRY_MAIL_HOST:-}:/var/log/${SENTRY_MAIL_HOST:-}"
-      - "/home/postfix/${SENTRY_MAIL_HOST:-}/keys:/etc/opendkim/keys"
+      - "/home/postfix/politcubes.com:/var/log/politcubes.com"
+      - "/home/postfix/politcubes.com/keys:/etc/opendkim/keys"
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.9-alpine"
