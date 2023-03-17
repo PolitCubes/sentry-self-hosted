@@ -69,7 +69,7 @@ x-sentry-defaults: &sentry_defaults
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
-    SENTRY_MAIL_HOST: "politcubes.com"
+    SENTRY_MAIL_HOST: politcubes.com
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
