@@ -104,7 +104,7 @@ services:
       - LOGOUTPUT=/var/log/politcubes.com/maillog
       - TLS_SECURITY_LEVEL=encrypt
       - USE_DKIM=yes
-      - DKIM_KEYFILE=/etc/opendkim/keys/politcubes.com.key
+      - DKIM_KEYFILE=/etc/opendkim/keys/sentry.politcubes.com.key
       - DKIM_SELECTOR=sentry
     volumes:
       - "/home/postfix/politcubes.com:/var/log/politcubes.com"
