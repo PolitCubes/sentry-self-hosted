@@ -47,7 +47,7 @@ mail.from: 'Gravit Launcher Sentry <sentry@politcubes.com>'
 # If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
-system.secret-key: '!!changeme!!'
+system.secret-key: '^fWL6ON2EuHF.SDn&@Dqwgxe6aAT;VAxnt:*3kV<xn(8:02P,E'
 
 # The ``redis.clusters`` setting is used, unsurprisingly, to configure Redis
 # clusters. These clusters can be then referred to by name when configuring
