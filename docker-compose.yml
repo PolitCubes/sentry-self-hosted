@@ -69,7 +69,7 @@ x-sentry-defaults: &sentry_defaults
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
-    SENTRY_MAIL_HOST: politcubes.com
+    SENTRY_MAIL_HOST: sentry.gravitlauncher.com
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -100,15 +100,15 @@ services:
     <<: *restart_policy
     image: freinet/postfix-relay
     environment:
-      - MAILNAME=politcubes.com
-      - LOGOUTPUT=/var/log/politcubes.com/maillog
+      - MAILNAME=sentry.gravitlauncher.com
+      - LOGOUTPUT=/var/log/sentry.gravitlauncher.com/maillog
       - TLS_SECURITY_LEVEL=encrypt
       - USE_DKIM=yes
-      - DKIM_KEYFILE=/etc/opendkim/keys/sentry.politcubes.com.key
+      - DKIM_KEYFILE=/etc/opendkim/keys/sentry.gravitlauncher.com.key
       - DKIM_SELECTOR=sentry
     volumes:
-      - "/home/postfix/politcubes.com:/var/log/politcubes.com"
-      - "/home/postfix/politcubes.com/keys:/etc/opendkim/keys"
+      - "/home/postfix/sentry.gravitlauncher.com:/var/log/sentry.gravitlauncher.com"
+      - "/home/postfix/sentry.gravitlauncher.com/keys:/etc/opendkim/keys"
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.9-alpine"
