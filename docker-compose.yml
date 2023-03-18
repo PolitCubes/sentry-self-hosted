@@ -103,7 +103,6 @@ services:
       - MAILNAME=politcubes.com
       - LOGOUTPUT=/var/log/politcubes.com/maillog
       - TLS_SECURITY_LEVEL=encrypt
-      - POSTFIX_ADD_MISSING_HEADERS=yes
       - USE_DKIM=yes
       - DKIM_KEYFILE=/etc/opendkim/keys/politcubes.com.key
       - DKIM_SELECTOR=sentry
