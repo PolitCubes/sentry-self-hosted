@@ -3,6 +3,13 @@
 
 from sentry.conf.server import *  # NOQA
 
+BYTE_MULTIPLIER = 1024
+UNITS = ("K", "M", "G")
+def unit_text_to_bytes(text):
+    unit = text[-1].upper()
+    power = UNITS.index(unit) + 1
+    return float(text[:-1])*(BYTE_MULTIPLIER**power)
+
 
 # Generously adapted from pynetlinux: https://github.com/rlisagor/pynetlinux/blob/e3f16978855c6649685f0c43d4c3fcf768427ae5/pynetlinux/ifconfig.py#L197-L223
 def get_internal_network():
@@ -107,6 +114,9 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
+        "OPTIONS": {
+            "server_max_value_length": unit_text_to_bytes(env("SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE", "1M")),
+        },
     }
 }
 
@@ -259,6 +269,7 @@ SENTRY_FEATURES.update(
             "organizations:performance-view",
             "organizations:advanced-search",
             "organizations:session-replay",
+            "organizations:profiling",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
@@ -281,3 +292,31 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 
 # BITBUCKET_CONSUMER_KEY = 'YOUR_BITBUCKET_CONSUMER_KEY'
 # BITBUCKET_CONSUMER_SECRET = 'YOUR_BITBUCKET_CONSUMER_SECRET'
+
+##############################################
+# Suggested Fix Feature / OpenAI Integration #
+##############################################
+
+# See https://docs.sentry.io/product/issues/issue-details/ai-suggested-solution/
+# for more information about the feature. Make sure the OpenAI's privacy policy is
+# aligned with your company.
+
+# Set the OPENAI_API_KEY on the .env or .env.custom file with a valid
+# OpenAI API key to turn on the feature.
+OPENAI_API_KEY = env("OPENAI_API_KEY", "")
+
+if OPENAI_API_KEY:
+  SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
+
+##############################################
+# Content Security Policy settings
+##############################################
+
+if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE = ("csp.middleware.CSPMiddleware",) + MIDDLEWARE
+# CSP_REPORT_URI = "https://{your-sentry-installation}/api/{csp-project}/security/?sentry_key={sentry-key}"
+CSP_REPORT_ONLY = True
+
+# optional extra permissions
+# https://django-csp.readthedocs.io/en/latest/configuration.html
+# CSP_SCRIPT_SRC += ["example.com"]

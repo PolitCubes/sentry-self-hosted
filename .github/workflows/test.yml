@@ -23,7 +23,7 @@ jobs:
         with:
           path: self-hosted
       - name: End to end tests
-        uses: getsentry/action-self-hosted-e2e-tests@77805295ebff8a603def5970e18743ded72cb304
+        uses: getsentry/action-self-hosted-e2e-tests@f45ef07793b2cc805a9a9401819f486da449a90a
         with:
           project_name: self-hosted
 
@@ -44,11 +44,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Disabled due to https://github.com/getsentry/self-hosted/issues/1415
-          # - compose_version: "1.28.0"
-          #   compose_path: "/usr/local/bin"
-          # - compose_version: "1.29.2"
-          #   compose_path: "/usr/local/bin"
           - compose_version: "v2.0.1"
             compose_path: "/usr/local/lib/docker/cli-plugins"
           - compose_version: "v2.7.0"
@@ -64,6 +59,8 @@ jobs:
           # Always remove `docker compose` support as that's the newer version
           # and comes installed by default nowadays.
           sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          # Docker Compose v1 is installed here, remove it
+          sudo rm -f "/usr/local/bin/docker-compose"
           sudo rm -f "${{ matrix.compose_path }}/docker-compose"
           sudo mkdir -p "${{ matrix.compose_path }}"
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"

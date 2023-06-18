@@ -1,5 +1,70 @@
 # Changelog
 
+## 23.6.1
+
+### Various fixes & improvements
+
+- Fix bump version script (#2207) by @hubertdeng123
+
+## 23.6.0
+
+### Various fixes & improvements
+
+- Remove docker compose v1 (#2187) by @hubertdeng123
+- ref(compose): Separate ingest consumers (#2193) by @jan-auer
+- feat(profiling): Run profiling on self-hosted (#2154) by @phacops
+
+## 23.5.2
+
+- No documented changes.
+
+## 23.5.1
+
+### Various fixes & improvements
+
+- fix(suggested-fix): key should be 'key', not 'token' (#2146) by @aldy505
+
+## 23.5.0
+
+### Various fixes & improvements
+
+- Add no strict offset reset options to consumers (#2144) by @hubertdeng123
+- Add settings for enabling CSP to config file (#2134) by @hubertdeng123
+- feat: add suggested fix feature (#2115) by @aldy505
+- adding ulimits for zookeeper, kafka, and web (#2123) by @jamincollins
+- Uninstall Docker Compose v1 from CI so it's not used for tests (#2114) by @hubertdeng123
+- Fixed docker compose issue in backup/restore (#2110) by @montaniasystemab
+- Enable upstream keepalive (#2099) by @otbutz
+- Bump commit sha for e2e test action (#2104) by @hubertdeng123
+- Use docker compose exec to account for differences in container names for Postgres upgrade (#2096) by @hubertdeng123
+- Change symbolicator to use CalVer for release (#2091) by @hubertdeng123
+
+## 23.4.0
+
+### Postgres 14 Upgrade
+
+We've now included an upgrade from Postgres 9.6 to 14.5 that will automatically be run via the `./install.sh` script.
+
+By: @hubertdeng123 (#2074)
+
+### Various fixes & improvements
+
+- Remove clean function testing line (#2082) by @hubertdeng123
+- Fix command to get docker compose version in problem report template (#2080) by @hubertdeng123
+- Tweak permissioning of backup file in backup script to read/write for all users (#2043) by @hubertdeng123
+- Remove commit-batch-size parameter (#2058) by @hubertdeng123
+- Support external sourcemaps bigger, than 1Mb (#2050) by @le0pard
+- Add github setup instructions to config.example.yml (#2051) by @tm1000
+- ref(snuba): Use snuba self-hosted settings (#2039) by @enochtangg
+
+## 23.3.1
+
+### Various fixes & improvements
+
+- Bump Kafka version to keep up with SaaS (#2037) by @chadwhitacre
+- Add Backup/restore scripts (#2029) by @hubertdeng123
+- Add opt in error monitoring to reset and clean scripts (#2021) by @hubertdeng123
+
 ## 23.3.0
 
 ### Various fixes & improvements
