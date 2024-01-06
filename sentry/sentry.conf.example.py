@@ -188,6 +188,13 @@ SENTRY_TAGSTORE_OPTIONS = {}
 
 SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 
+###################
+# Metrics Backend #
+###################
+
+SENTRY_RELEASE_HEALTH = "sentry.release_health.metrics.MetricsReleaseHealthBackend"
+SENTRY_RELEASE_MONITOR = "sentry.release_health.release_monitor.metrics.MetricReleaseMonitorBackend"
+
 ##############
 # Web Server #
 ##############
@@ -269,7 +276,13 @@ SENTRY_FEATURES.update(
             "organizations:performance-view",
             "organizations:advanced-search",
             "organizations:session-replay",
+            "organizations:issue-platform",
             "organizations:profiling",
+            "organizations:dashboards-mep",
+            "organizations:mep-rollout-flag",
+            "organizations:dashboards-rh-widget",
+            "organizations:metrics-extraction",
+            "organizations:transaction-metrics-extraction",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
@@ -301,19 +314,14 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 # for more information about the feature. Make sure the OpenAI's privacy policy is
 # aligned with your company.
 
-# Set the OPENAI_API_KEY on the .env or .env.custom file with a valid
-# OpenAI API key to turn on the feature.
-OPENAI_API_KEY = env("OPENAI_API_KEY", "")
-
-if OPENAI_API_KEY:
-  SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
+# Set the feature to be True if you'd like to enable Suggested Fix. You'll also need to
+# add your OPENAI_API_KEY to the docker-compose.yml file.
+SENTRY_FEATURES["organizations:open-ai-suggestion"] = False
 
 ##############################################
 # Content Security Policy settings
 ##############################################
 
-if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
-    MIDDLEWARE = ("csp.middleware.CSPMiddleware",) + MIDDLEWARE
 # CSP_REPORT_URI = "https://{your-sentry-installation}/api/{csp-project}/security/?sentry_key={sentry-key}"
 CSP_REPORT_ONLY = True
 

@@ -9,7 +9,7 @@ on:
       - "release/**"
   pull_request:
   schedule:
-    - cron: '1 0 * * *'
+    - cron: "0 0,12 * * *"
 defaults:
   run:
     shell: bash
@@ -19,11 +19,24 @@ jobs:
     name: "Sentry self-hosted end-to-end tests"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: self-hosted
+
+      - name: Get Compose
+        run: |
+          # Always remove `docker compose` support as that's the newer version
+          # and comes installed by default nowadays.
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          # Docker Compose v1 is installed here, remove it
+          sudo rm -f "/usr/local/bin/docker-compose"
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
+          sudo curl -L https://github.com/docker/compose/releases/download/v2.7.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
+
       - name: End to end tests
-        uses: getsentry/action-self-hosted-e2e-tests@f45ef07793b2cc805a9a9401819f486da449a90a
+        uses: getsentry/action-self-hosted-e2e-tests@03010bd2963edc1f47b6e5e03167a4bc1433ea36
         with:
           project_name: self-hosted
 
@@ -32,7 +45,7 @@ jobs:
     name: "unit tests"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Unit Tests
         run: ./unit-test.sh
@@ -52,7 +65,7 @@ jobs:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get Compose
         run: |

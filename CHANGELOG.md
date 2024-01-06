@@ -1,5 +1,125 @@
 # Changelog
 
+## 23.12.1
+
+### Various fixes & improvements
+
+- Make a release issue template (#2666) by @chadwhitacre
+
+## 23.12.0
+
+### Various fixes & improvements
+
+- test(backup): Use --no-prompt for backup tests (#2618) by @azaslavsky
+
+## 23.11.2
+
+- No documented changes.
+
+## 23.11.1
+
+### Various fixes & improvements
+
+- feat: Add sentry-admin.sh tool (#2594) by @azaslavsky
+- Patch for dev self-hosted environments (#2592) by @hubertdeng123
+- Relicense under FSL-1.0-Apache-2.0 (#2586) by @chadwhitacre
+- Bump minimum ram usage (#2585) by @hubertdeng123
+
+## 23.11.0
+
+### Various fixes & improvements
+
+- feat: provide a toggle to enable discord integration (#2548) by @aldy505
+- ref: fix a typo (#2556) by @asottile-sentry
+- ref: use `git branch --show-current` instead of sed (#2550) by @asottile-sentry
+- Remove sessions infra (#2514) by @hubertdeng123
+- Upgrade Clickhouse to 21.8 (#2536) by @hubertdeng123
+- [Snyk] Security upgrade debian from bullseye-slim to bookworm-20231009-slim (#2511) by @Indigi-managed
+- snuba: Remove deprecated CLI arg (#2515) by @lynnagara
+
+## 23.10.1
+
+### Various fixes & improvements
+
+- Revert "feat: upgrade to zookeeper-less kafka (#2445)" (#2500) by @hubertdeng123
+- Add fast revert GH workflow (#2499) by @hubertdeng123
+- build(deps): bump actions/checkout from 3 to 4 (#2493) by @dependabot
+- configure dependabot (#2491) by @mdtro
+- deps: bump nginx to 1.25.2 (#2490) by @mdtro
+- feat: upgrade to zookeeper-less kafka (#2445) by @joshuarli
+- Update outdated install option in README (#2440) by @hubertdeng123
+
+## 23.10.0
+
+### Various fixes & improvements
+
+- Switch geoipupdate image to ghcr.io (#2442) by @hkraal
+- Add system.url-prefix to config for visibility (#2426) by @hubertdeng123
+- Remove CSPMiddleware since it is enabled by default in the upstream sentry (#2434) by @oioki
+- Update nginx.conf (#2455) by @mwarkentin
+- Update Redis container image to 6.2.13 (#2432) by @mencarellic
+
+## 23.9.1
+
+### Various fixes & improvements
+
+- fix: e2e test jq bug (#2410) by @azaslavsky
+- feat(backup): Support new backup script (#2407) by @azaslavsky
+- Decrease frequency of e2e tests (#2383) by @hubertdeng123
+- Reduce logs coming from clickhouse (#2382) by @hubertdeng123
+- Increase frequency of e2e test runs (#2375) by @hubertdeng123
+- Remove nginx content-disposition hack for safari (#2381) by @hubertdeng123
+- Attempt to fix integration test flakiness (#2372) by @hubertdeng123
+- change health check for kafka service (#2371) by @johnatannvmd
+- Add metrics and generic metrics backend (#2355) by @hubertdeng123
+- Bump self-hosted e2e action commit sha (#2369) by @hubertdeng123
+
+## 23.8.0
+
+### Various fixes & improvements
+
+- Add issue platform infra (#2309) by @hubertdeng123
+
+## 23.7.2
+
+### Various fixes & improvements
+
+- Ignore fixture-custom-ca-roots service in integration test (#2321) by @hubertdeng123
+- Update GeoIpUpdate to v6.0.0 (#2287) by @victorelec14
+- Bump healthcheck timeout (#2300) by @hubertdeng123
+
+## 23.7.1
+
+### Various fixes & improvements
+
+- Resolve Safari Content-Disposition header bug (#2297) by @azaslavsky
+- feat: vroom cleanup script that respects default retention days (#2211) by @aldy505
+
+## 23.7.0
+
+### Various fixes & improvements
+
+- Remove nc -q option (#2275) by @hubertdeng123
+- Move open ai key from env variables (#2274) by @hubertdeng123
+- Fix command called in reset script (#2254) by @stayallive
+- Remove stale-bot in self-hosted (#2255) by @hubertdeng123
+- Update geoipupdate to 5.1.1 (#2236) by @williamdes
+
+## 23.6.2
+
+### Various fixes & improvements
+
+- Update nginx to 1.25.1 (#2235) by @williamdes
+- Fix error fingerprinting (#2237) by @chadwhitacre
+- A couple unit testing improvements (#2238) by @chadwhitacre
+- Fix #1684 (#2234) by @azaslavsky
+- Update memcached to 1.6.21 (#2231) by @williamdes
+- Update redis to 6.2.12 (#2230) by @williamdes
+- ref: Move all consumers to unified consumer CLI (#2224) by @hubertdeng123
+- Revert "ref: Move most consumers to unified consumer CLI" (#2223) by @hubertdeng123
+- ref: Move most consumers to unified consumer CLI (#2203) by @untitaker
+- Release 23.6.1 cleanup (#2209) by @hubertdeng123
+
 ## 23.6.1
 
 ### Various fixes & improvements
@@ -194,7 +314,7 @@ By: @hubertdeng123 (#2074)
 
 - fix "services.web.healthcheck.retries must be a number" (#1482) by @yuval1986
 - Add volume for nginx cache (#1511) by @glensc
-- snuba: New subscriptions infrastucture rollout (#1507) by @lynnagara
+- snuba: New subscriptions infrastructure rollout (#1507) by @lynnagara
 - Ease modification of base image (#1479) by @spawnia
 
 ## 22.5.0
