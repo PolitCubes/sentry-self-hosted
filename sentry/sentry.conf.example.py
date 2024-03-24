@@ -5,10 +5,12 @@ from sentry.conf.server import *  # NOQA
 
 BYTE_MULTIPLIER = 1024
 UNITS = ("K", "M", "G")
+
+
 def unit_text_to_bytes(text):
     unit = text[-1].upper()
     power = UNITS.index(unit) + 1
-    return float(text[:-1])*(BYTE_MULTIPLIER**power)
+    return float(text[:-1]) * (BYTE_MULTIPLIER**power)
 
 
 # Generously adapted from pynetlinux: https://github.com/rlisagor/pynetlinux/blob/e3f16978855c6649685f0c43d4c3fcf768427ae5/pynetlinux/ifconfig.py#L197-L223
@@ -114,7 +116,7 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
-        "OPTIONS": {"ignore_exc": True}
+        "OPTIONS": {"ignore_exc": True},
     }
 }
 
@@ -191,7 +193,9 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 ###################
 
 SENTRY_RELEASE_HEALTH = "sentry.release_health.metrics.MetricsReleaseHealthBackend"
-SENTRY_RELEASE_MONITOR = "sentry.release_health.release_monitor.metrics.MetricReleaseMonitorBackend"
+SENTRY_RELEASE_MONITOR = (
+    "sentry.release_health.release_monitor.metrics.MetricReleaseMonitorBackend"
+)
 
 ##############
 # Web Server #
@@ -248,7 +252,7 @@ SENTRY_WEB_OPTIONS = {
 # Mail #
 ########
 
-SENTRY_OPTIONS["mail.list-namespace"] = env('SENTRY_MAIL_HOST', 'localhost')
+SENTRY_OPTIONS["mail.list-namespace"] = env("SENTRY_MAIL_HOST", "localhost")
 SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}"
 
 ############
@@ -289,6 +293,25 @@ SENTRY_FEATURES.update(
             "projects:rate-limits",
             "projects:servicehooks",
         )
+        + (
+            "projects:span-metrics-extraction",
+            "organizations:starfish-browser-resource-module-image-view",
+            "organizations:starfish-browser-resource-module-ui",
+            "organizations:starfish-browser-webvitals",
+            "organizations:starfish-browser-webvitals-pageoverview-v2",
+            "organizations:starfish-browser-webvitals-use-backend-scores",
+            "organizations:performance-calculate-score-relay",
+            "organizations:starfish-browser-webvitals-replace-fid-with-inp",
+            "organizations:deprecate-fid-from-performance-score",
+            "organizations:performance-database-view",
+            "organizations:starfish-browser-webvitals",
+            "organizations:performance-screens-view",
+            "organizations:starfish-browser-resource-module-ui",
+            "organizations:starfish-browser-webvitals-pageoverview-v2",
+            "organizations:starfish-browser-webvitals-use-backend-scores",
+            "organizations:mobile-ttid-ttfd-contribution",
+            "organizations:starfish-mobile-appstart",
+        )  # starfish related flags
     }
 )
 
@@ -296,7 +319,7 @@ SENTRY_FEATURES.update(
 # MaxMind Integration #
 #######################
 
-GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
+GEOIP_PATH_MMDB = "/geoip/GeoLite2-City.mmdb"
 
 #########################
 # Bitbucket Integration #
@@ -317,8 +340,7 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 # OpenAI API key to turn on the feature.
 OPENAI_API_KEY = env("OPENAI_API_KEY", "")
 
-if OPENAI_API_KEY:
-  SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
+SENTRY_FEATURES["organizations:open-ai-suggestion"] = bool(OPENAI_API_KEY)
 
 ##############################################
 # Content Security Policy settings
@@ -340,4 +362,4 @@ CSP_REPORT_ONLY = True
 # this to match your IPs/domains. Ports should be included if you are using custom ports.
 # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 
-# CSRF_TRUSTED_ORIGINS = ["example.com", "127.0.0.1:9000"]
+# CSRF_TRUSTED_ORIGINS = ["https://example.com", "http://127.0.0.1:9000"]
