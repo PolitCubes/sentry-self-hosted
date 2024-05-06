@@ -18,11 +18,15 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
-    subprocess.run(["docker", "compose", "--ansi", "never", "up", "-d"], check=True)
+    subprocess.run(
+        ["docker", "compose", "--ansi", "never", "up", "-d"],
+        check=True,
+        capture_output=True,
+    )
     for i in range(TIMEOUT_SECONDS):
         try:
             response = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
-        except httpx.NetworkError:
+        except httpx.RequestError:
             time.sleep(1)
         else:
             if response.status_code == 200:
@@ -36,7 +40,7 @@ def configure_self_hosted_environment(request):
 #!/bin/bash
 touch /created-by-enhance-image
 apt-get update
-apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
+apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
 """
 
         with open("sentry/enhance-image.sh", "w") as script_file:
@@ -48,7 +52,7 @@ apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
         with open("sentry/requirements.txt", "w") as req_file:
             req_file.write("python-ldap\n")
         os.environ["MINIMIZE_DOWNTIME"] = "1"
-        subprocess.run(["./install.sh"], check=True)
+        subprocess.run(["./install.sh"], check=True, capture_output=True)
     # Create test user
     subprocess.run(
         [
