@@ -1,5 +1,56 @@
 # Changelog
 
+## 24.8.0
+
+### Various fixes & improvements
+
+- Migrate to zookeeper-less kafka  (#3263) by @hubertdeng123
+- Revert "ref(feedback): cleanup topic rollout option" (#3262) by @aliu39
+- ref(feedback): cleanup topic rollout option (#3256) by @aliu39
+- Remove cdc and wal2json and use the default postgres entrypoint (#3260) by @beezz
+- add `-euo pipefail` to enhance-image.example.sh (#3246) by @asottile-sentry
+- remove python-dev (#3242) by @asottile-sentry
+- feat: enable user feedback feature (#3193) by @aldy505
+- Use CDN by default for JS SDK Loader (#3213) by @stayallive
+
+## 24.7.1
+
+### Various fixes & improvements
+
+- Fix: errors only config flag (#3220) by @hubertdeng123
+- Add errors only self-hosted infrastructure (#3190) by @hubertdeng123
+- feat(generic-metrics): Add gauges to docker compose, re-try (#3177) by @ayirr7
+
+## 24.7.0
+
+### Various fixes & improvements
+
+- Check postgres os before proceeding with install (#3197) by @hubertdeng123
+- Update sentry-admin.sh to select its own working directory (#3184) by @theoriginalgri
+- feat: add insights feature flags (#3152) by @aldy505
+- feat(relay): Forward /api/0/relays/* to inner relays (#3144) by @iambriccardo
+
+## 24.6.0
+
+### Various fixes & improvements
+
+- Use general kafka topic creation in self-hosted (#3121) by @hubertdeng123
+- Use non-alpine postgres (#3116) by @hubertdeng123
+- Bump Python SDK version used in tests (#3108) by @sentrivana
+
+## 24.5.1
+
+### Various fixes & improvements
+
+- Update consumer flags (#3112) by @hubertdeng123
+- feat: Add crons task consumers  (#3106) by @wedamija
+- Update minimum docker compose requirement (#3078) by @JannKleen
+- Different approach to editing permissions of docker volumes (#3084) by @hubertdeng123
+- ref(spans): Add new feature flags needed (#3092) by @phacops
+- chore: Add comment explaining the one liner in clickhouse config (#3085) by @hubertdeng123
+- Fix install: use dynamic docker root dir instead of hardcoded one (#3064) by @boutetnico
+- Typo in config.example.yml (#3063) by @luchaninov
+
 ## 24.5.0
 
 ### Various fixes & improvements
