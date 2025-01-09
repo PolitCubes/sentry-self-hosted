@@ -59,7 +59,6 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST: sentry.gravitlauncher.com
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
-    OPENAI_API_KEY:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -112,13 +111,18 @@ services:
     image: "redis:6.2.14-alpine"
     healthcheck:
       <<: *healthcheck_defaults
-      test: redis-cli ping
+      test: redis-cli ping | grep PONG
     volumes:
       - "sentry-redis:/data"
+      - type: bind
+        read_only: true
+        source: ./redis.conf
+        target: /usr/local/etc/redis/redis.conf
     ulimits:
       nofile:
         soft: 10032
         hard: 10032
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
@@ -462,9 +466,10 @@ services:
     volumes:
       - type: bind
         read_only: true
-        source: ./nginx
-        target: /etc/nginx
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
       - sentry-nginx-cache:/var/cache/nginx
+      - sentry-nginx-www:/var/www
     depends_on:
       - web
       - relay
@@ -534,6 +539,9 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+  # This volume stores JS SDK assets and the data inside this volume should
+  # be cleaned periodically on upgrades.
+  sentry-nginx-www:
   # This volume stores profiles and should be persisted.
   # Not being external will still persist data across restarts.
   # It won't persist if someone does a docker compose down -v.

@@ -1,5 +1,59 @@
 # Changelog
 
+## 24.12.1
+
+### Various fixes & improvements
+
+- chore: clearer message for errors-only mode (#3487) by @aldy505
+- chore(relay): provide opt-in max_memory_percent config as workaround for failing healthcheck (#3486) by @aldy505
+- fix(nginx): _assets should rewrite to _static/sentry/dist (#3483) by @BYK
+
+## 24.12.0
+
+- No documented changes.
+
+## 24.11.2
+
+### Various fixes & improvements
+
+- fix(redis): Actually use custom config (#3459) by @BYK
+- feat(release): Replace release bot with GH app (#3458) by @Jeffreyhung
+- chore(issue-template): ask for machine specification and provide link to security policy (#3447) by @aldy505
+- add sentry/backup.json to gitignore (#3450) by @niklassc7
+- ref: remove suggested fix (#3446) by @aldy505
+
+## 24.11.1
+
+### Various fixes & improvements
+
+- fix(redis): Use a safer eviction rule (#3432) by @BYK
+- feat: add Redis configuration for improved memory management (#3427) by @Hassanzadeh-sd
+- build(deps): bump codecov/codecov-action from 4 to 5 (#3429) by @dependabot
+
+## 24.11.0
+
+### Various fixes & improvements
+
+- feat(healthcheck): Improve redis healthcheck (#3422) by @hubertdeng123
+- fix: missing mime types and turning off autoindex for js-sdk endpoint (#3395) by @aldy505
+- fix: Use js.sentry-cdn.com for JS SDK downloads (#3417) by @BYK
+- fix(loader): provide js sdk assets from 4.x (#3415) by @aldy505
+- Revert "Revert "ref(feedback): remove issue platform flags after releasing issue types"" (#3403) by @BYK
+- Revert "ref(feedback): remove issue platform flags after releasing issue types" (#3402) by @BYK
+- ref(feedback): remove issue platform flags after releasing issue types (#3397) by @aliu39
+- fix(sentry-admin): Do not wait for command finish to display output (#3390) by @Makhonya
+
+## 24.10.0
+
+### Various fixes & improvements
+
+- chore: Disable codecov for master/release branches (#3384) by @hubertdeng123
+- chore: replace old URLs of the repo with the new docs (#3375) by @victorelec14
+- ref: span normalization allowed host config (#3245) by @aldy505
+- docs: explicitly specify `mail.use-{tls,ssl}` is mutually exclusive (#3368) by @aldy505
+- ref: allow hosted js sdk bundles (#3365) by @aldy505
+- fix(clickhouse): Allow nullable key (#3354) by @nikhars
+
 ## 24.9.0
 
 ### Various fixes & improvements
