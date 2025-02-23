@@ -1,5 +1,44 @@
 # Changelog
 
+## 25.2.0
+
+### Various fixes & improvements
+
+- build(deps): bump actions/create-github-app-token from 1.11.2 to 1.11.3 (#3569) by @dependabot
+- feat: merge `.env` and `.env.custom` file during installation (#3564) by @aldy505
+- build(deps): bump actions/create-github-app-token from 1.11.1 to 1.11.2 (#3561) by @dependabot
+- feat: Require both inputs to be set on action (#3554) by @BYK
+- ref: Simpler and more accurate cache keys (#3553) by @BYK
+- Hand off open-source to dev-infra (#3549) by @chadwhitacre
+- ci: Remove obsolete `dcr up -w` from import test (#3544) by @BYK
+- fix: github.action_path may not have trailing slash (#3547) by @BYK
+- chore: Remove upgrade test (#3541) by @hubertdeng123
+- fix: Use correct path for get compose action (#3539) by @hubertdeng123
+- fix: Caching of sentry migrations should cover additional folders (#3542) by @hubertdeng123
+- ci: Move self-contained action reference to master branch (#3538) by @BYK
+- breaking: Upgrade min Compose version to 2.23.2 (#3535) by @BYK
+- ci: Even better cache keys and granular caching (#3534) by @BYK
+- test: Reorganize backup/restore tests for speed and reliability (#3537) by @BYK
+
+## 25.1.0
+
+### Various fixes & improvements
+
+- ci: Use generic Docker volume cache action (#3524) by @BYK
+- ci: Less volatile cache keys (#3522) by @BYK
+- docs: include regular env file on wrap-up (#3523) by @aldy505
+- ci: Faster and smarter backup/restore tests (#3516) by @BYK
+- fix: Fix the new e2e action to be portable (#3520) by @BYK
+- ci: Move e2e test action into the repo (#3519) by @BYK
+- ci: Only test on compose 2.26 w/ customizations (#3506) by @BYK
+- ci: Skip DB ops during install completely on cache hit (#3496) by @BYK
+- chore: Remove everything zookeeper (#3499) by @hubertdeng123
+- ci: Cache postgres volume after first migration (#3488) by @BYK
+- fix: Remove the extra space in the log file names (#3212) by @melnele
+- ref(snuba): Combine bootstrap & migrate for faster bootstrap (#3491) by @BYK
+- ref(geoip): Remove geoipupdate from compose (#3490) by @BYK
+- build(deps): bump actions/create-github-app-token from 1.11.0 to 1.11.1 (#3492) by @dependabot
+
 ## 24.12.1
 
 ### Various fixes & improvements
