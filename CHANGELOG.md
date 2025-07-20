@@ -1,5 +1,51 @@
 # Changelog
 
+## 25.7.0
+
+### Various fixes & improvements
+
+- feat: Swap `trace-view-v1` feature flag with `visibility-explore-view` (#3801) by @aldy505
+- fix: set harakiri Django option to 30s (#3792) by @aldy505
+- feat(images):Cutover images to ghcr (#3800) by @hubertdeng123
+- docs: encourage community patches (#3794) by @aldy505
+- feat: run EAP-related containers (#3778) by @aldy505
+- feat(uptime): Enable uptime in self-hosted (#3787) by @evanpurkhiser
+- feat: make `system.secret-key` configurable from environment variables (#3783) by @aldy505
+- ci: run tests on arm64 (#3750) by @aldy505
+
+## 25.6.2
+
+### Various fixes & improvements
+
+- fix: Increase timeout for flakey test (#3781) by @tobias-wilfert
+- chore: provide detailed note for sentry endpoint settings (#3780) by @aldy505
+
+## 25.6.1
+
+### Various fixes & improvements
+
+- fix(taskworker) Remove num-brokers (#3769) by @markstory
+- feat: enable customization sentry DSN endpoint (#3747) by @yildizozgur
+- ref(js-assets): Simplify how we call nginx container (#3761) by @BYK
+- Revert "fix(vroom): Explicitly set PROFILES_DIR for upcoming change" (#3760) by @hubertdeng123
+- fix(vroom): Explicitly set PROFILES_DIR for upcoming change (#3759) by @BYK
+
+## 25.6.0
+
+### Various fixes & improvements
+
+- enable shell linter for more scripts (#3748) by @doc-sheet
+- feat: migrate to arm64-compatible smtp image (#3746) by @ezhevita
+- Introduce patches with external kafka (#3521) by @aldy505
+- add shellcheck action to lint bash scripts (#3710) by @doc-sheet
+- tests: Install version 2.x of Python SDK (#3745) by @sentrivana
+- feat(features): enable continuous profiling (#3742) by @aldy505
+- feat: Add taskbroker + worker + scheduler (#3738) by @markstory
+- fix(profiles): Run the profile chunks consumer (#3739) by @phacops
+- chore: prune removed feature flags on main repository (#3731) by @aldy505
+- remove index workaround (#3730) by @asottile-sentry
+- Make usage of Python SDK future proof (#3714) by @antonpirker
+
 ## 25.5.1
 
 ### Various fixes & improvements
