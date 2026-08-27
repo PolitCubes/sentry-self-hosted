@@ -146,10 +146,10 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.20-alpine"
+    image: "valkey/valkey:8.1.9-alpine"
     healthcheck:
       <<: *healthcheck_defaults
-      test: redis-cli ping | grep PONG
+      test: valkey-cli ping | grep PONG
     volumes:
       - "sentry-redis:/data"
       - type: bind
@@ -160,7 +160,7 @@ services:
       nofile:
         soft: 10032
         hard: 10032
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    command: ["valkey-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
@@ -211,7 +211,11 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
-      KAFKA_LOG_RETENTION_HOURS: "24"
+      # Lower the log retention to 1 hours to avoid filling up the disk,
+      # ONLY IF you have fast processing time and/or small data volumes.
+      # Otherwise, you can set it to a higher value if you have much slower
+      # processing time and/or larger data volumes.
+      KAFKA_LOG_RETENTION_HOURS: "3"
       KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
       KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
@@ -220,8 +224,8 @@ services:
       KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
     ulimits:
       nofile:
-        soft: 4096
-        hard: 4096
+        soft: 100000
+        hard: 100000
     volumes:
       - "sentry-kafka:/var/lib/kafka/data"
       - "sentry-kafka-log:/var/lib/kafka/log"
@@ -272,7 +276,7 @@ services:
       retries: 30
   seaweedfs:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.29_large_disk@sha256:e5ca7cc6b61cf5d89a5f85821e0cf115a9765e2d1f27223cbb7722c7837c024e"
+    image: "chrislusf/seaweedfs:4.40_large_disk@sha256:d07aa1dae03c687e0737b86130ded1b18474211a09e85d737fbe5508b8805139"
     entrypoint: "weed"
     command: >-
         mini
@@ -324,6 +328,11 @@ services:
     command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
+  snuba-outcomes-accepted-consumer:
+    <<: *snuba_defaults
+    command: accepted-outcomes-consumer --storage eap_items --consumer-group accepted_outcomes --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --accepted-outcomes-topic outcomes-billing --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    profiles:
+      - feature-complete
   snuba-outcomes-billing-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --raw-events-topic outcomes-billing --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
@@ -390,20 +399,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  snuba-subscription-consumer-generic-metrics-distributions:
-    <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_distributions   --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-distributions-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-distributions-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-subscription-consumer-generic-metrics-sets:
-    <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_sets --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-sets-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-sets-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   snuba-subscription-consumer-generic-metrics-counters:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-counters-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-counters-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
@@ -411,37 +406,9 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  snuba-subscription-consumer-generic-metrics-gauges:
-    <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_gauges --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-gauges-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-gauges-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-generic-metrics-distributions-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-generic-metrics-sets-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   snuba-generic-metrics-counters-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-generic-metrics-gauges-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
@@ -523,17 +490,17 @@ services:
         - 'exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e "GET /_health/ HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
   events-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-events --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-events --consumer-group ingest-consumer --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
   attachments-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-attachments --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-attachments --consumer-group ingest-consumer --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer post-process-forwarder-errors --auto-offset-reset=earliest --no-strict-offset-reset --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
   ##############################################
@@ -541,105 +508,91 @@ services:
   ##############################################
   transactions-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-transactions --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-transactions --consumer-group ingest-consumer --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-metrics --consumer-group metrics-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-metrics --consumer-group metrics-consumer --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   generic-metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  billing-metrics-consumer:
-    <<: *sentry_defaults
-    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  ingest-replay-recordings:
-    <<: *sentry_defaults
-    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-occurrences:
     <<: *sentry_defaults
-    command: run consumer ingest-occurrences --consumer-group ingest-occurrences --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-occurrences --consumer-group ingest-occurrences --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-monitors:
     <<: *sentry_defaults
-    command: run consumer ingest-monitors --consumer-group ingest-monitors --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-monitors --consumer-group ingest-monitors --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-feedback-events:
     <<: *sentry_defaults
-    command: run consumer ingest-feedback-events --consumer-group ingest-feedback --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer ingest-feedback-events --consumer-group ingest-feedback --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   process-spans:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer process-spans --consumer-group process-spans --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   process-segments:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer process-segments --consumer-group process-segments --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
-    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   monitors-clock-tasks:
     <<: *sentry_defaults
-    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   uptime-results:
     <<: *sentry_defaults
-    command: run consumer uptime-results --consumer-group uptime-results --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer uptime-results --consumer-group uptime-results --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --auto-offset-reset=earliest --no-strict-offset-reset --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --auto-offset-reset=earliest --no-strict-offset-reset --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
@@ -657,7 +610,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.31.2-alpine"
+    image: "nginx:1.31.3-alpine"
     volumes:
       - type: bind
         read_only: true
